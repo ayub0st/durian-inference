@@ -38,16 +38,20 @@ a{color:var(--brand); text-decoration:none}
 ol{margin:0 0 0 18px}
 li+li{margin-top:4px}
 
+/* Alerts */
 .alert{border:1px solid var(--border); padding:12px; border-radius:12px; margin-bottom:12px; background:rgba(255,255,255,0.03); font-size:14px}
 .alert.error{border-color:rgba(255,0,89,.4); background:rgba(255,0,89,.08); color:#ffb1be}
 .alert.ok{border-color:rgba(0,255,153,.3); background:rgba(0,255,153,.07); color:#b4ffe8}
 
+/* Developer panel */
 .dev-panel{border-left:1px dashed var(--border); padding-left:12px}
 
+/* Tabs */
 .tabs{display:flex; gap:8px; margin:6px 0 10px}
 .tab{background:var(--panel2); color:var(--text); border:1px solid var(--border); border-radius:10px; padding:8px 12px; font-weight:600; cursor:pointer}
 .tab.active{outline:2px solid rgba(106,166,255,.6)}
 
+/* Top1/2/3 cards */
 .top3grid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:8px 0 12px}
 .topcard{background:var(--panel2); border:1px solid var(--border); border-radius:12px; padding:10px}
 .topcard .badge{display:inline-block; padding:4px 8px; border-radius:999px; font-size:12px; border:1px solid var(--border); margin-bottom:6px}
@@ -57,6 +61,7 @@ li+li{margin-top:4px}
 .topcard .name{font-weight:700}
 .topcard .pct{opacity:.8}
 
+/* Advice lists */
 .advice-block{margin:10px 0 14px; padding:10px; border:1px solid var(--border); border-radius:12px}
 .advice-title{font-weight:700; margin-bottom:6px}
 .advice-list{margin:0; padding-left:20px}
