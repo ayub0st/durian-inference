@@ -19,7 +19,7 @@
   <main class="container">
     <section class="card">
       <h2>อัปโหลดรูป</h2>
-      <p class="hint">ระบบใช้โมเดล ที่กำหนดไว้แล้ว </p>
+      <p class="hint">ระบบใช้โมเดลที่กำหนดไว้แล้ว • อัปโหลดรูป “ใบทุเรียน” ให้ชัด เต็มเฟรม พื้นหลังเรียบ</p>
 
       <div class="grid">
         <div class="col">
@@ -35,6 +35,7 @@
           <div class="row">
             <button id="runBtn" class="btn btn-primary">Run Inference</button>
             <button id="clearBtn" class="btn btn-ghost">ล้างค่า</button>
+            <button id="resetBtn" class="btn btn-ghost">Reset</button>
             <span id="status" class="status">พร้อมทำงาน</span>
           </div>
         </div>
@@ -42,6 +43,8 @@
     </section>
 
     <section class="card">
+      <div id="gateAlert" class="alert hidden"></div>
+
       <div class="grid">
         <div class="col">
           <h3>สรุปผล</h3>
