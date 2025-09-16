@@ -1,241 +1,71 @@
-// ===== CONFIG =====
-const ROBOFLOW_MODEL   = "durian-leaf-hpx1m";
-const ROBOFLOW_VERSION = "1";
-const ROBOFLOW_API_KEY = "qUdNbcOApV2SReomWRn7";
-
-// Optional: mapping คำแนะนำอย่างง่าย (สามารถแก้/เพิ่มเองได้)
-const ADVICE_MAP = {
-  "ALGAL_LEAF_SPOT": {
-    tips: [
-      "ตัดใบที่เป็นโรคออกและเผาทำลาย",
-      "พ่นสารทองแดง (Copper) ตามคำแนะนำ",
-      "ลดความชื้นในแปลง"
-    ],
-    fertilizer: ["โพแทสเซียม (K)", "แคลเซียม-ซิลิกา เพื่อเสริมความแข็งแรงใบ"]
-  },
-  "Algal-Leaf-Spot": {
-    tips:[ "ตัดใบที่เป็นโรคออกและเผาทำลาย",
-      "พ่นสารทองแดง (Copper) ตามคำแนะนำ",
-      "ลดความชื้นในแปลง"
-    ],
-    fertilizer: ["โพแทสเซียม (K)", "แคลเซียม-ซิลิกา เพื่อเสริมความแข็งแรงใบ"]
-  },
-  "ALLOCARIDARA_ATTACK": {
-    tips: [
-      "ใช้กับดักกาวเหนียวสีเหลือง",
-      "พ่นน้ำส้มควันไม้หรือน้ำสบู่",
-      "ใช้เชื้อรา Beauveria bassiana หรือสารกำจัดแมลงกลุ่ม Imidacloprid (ถ้าระบาดหนัก)"
-    ],
-    fertilizer: ["ฟอสฟอรัส (P)", "โพแทสเซียม (K)", "แมกนีเซียม (Mg)"]
-  },
-
-  "HEALTHY_LEAF": {
-    tips: [
-      "ดูแลความชื้นให้เหมาะสม",
-      "ใส่ปุ๋ยสม่ำเสมอ",
-      "เฝ้าระวังโรคและแมลง"
-    ],
-    fertilizer: ["สูตรเสมอ 15-15-15", "เสริมธาตุรอง B, Zn, Mg"]
-  },
-
-  "LEAF_BLIGHT": {
-    tips: [
-      "กำจัดใบที่เป็นโรคและเผาทำลาย",
-      "ตัดแต่งกิ่งให้โปร่ง",
-      "พ่นสารป้องกันเชื้อรา (Mancozeb/Chlorothalonil/Copper)"
-    ],
-    fertilizer: ["NPK 13-13-21", "อินทรีย์ผสมฮิวมิคแอซิด"]
-  },
-  "Leaf-Blight": {
-    tips: ["เหมือน LEAF_BLIGHT"],
-    fertilizer: ["เหมือน LEAF_BLIGHT"]
-  },
-
-  "LEAF_SPOT": {
-    tips: [
-      "เก็บใบที่ร่วงเผาทำลาย",
-      "พ่นสาร Copper หรือ Mancozeb",
-      "ควบคุมความชื้นในสวน"
-    ],
-    fertilizer: ["โพแทสเซียมสูง (K)", "ธาตุรอง Zn, Mn, B"]
-  },
-  "Leaf-Spot": {
-    tips: ["เหมือน LEAF_SPOT"],
-    fertilizer: ["เหมือน LEAF_SPOT"]
-  },
-
-  "No Disease": {
-    tips: [
-      "ดูแลน้ำ-ปุ๋ยให้สมดุล",
-      "ตรวจสอบใบอย่างสม่ำเสมอ"
-    ],
-    fertilizer: ["25-7-7 หรือ 16-16-16 ในระยะใบอ่อน", "12-24-12 เตรียมออกดอก"]
-  },
-
-  "PHOMOPSIS_LEAF_SPOT": {
-    tips: [
-      "ตัดแต่งกิ่งให้โปร่งแสง",
-      "เก็บใบที่เป็นโรคและเศษใบไปทำลาย",
-      "พ่นสารป้องกันเชื้อรา (Carbendazim / Thiophanate-methyl)"
-    ],
-    fertilizer: ["โพแทสเซียมสูง (K)", "แคลเซียม-โบรอน (Ca-B)", "ปุ๋ยอินทรีย์เสริม"]
-  }
-};
-
-
-$(function(){
-  $('#status').text('พร้อมทำงาน');
-  $('#pickFile').on('click', (e)=>{ e.preventDefault(); $('#file').click(); });
-  $('#file').on('change', handleFile);
-  $('#runBtn').on('click', run);
-  $('#clearBtn').on('click', clearAll);
-  $('#copyBtn').on('click', copyJson);
-  initDrop();
-});
-
-function initDrop(){
-  const dz = document.getElementById('dropzone');
-  ['dragenter','dragover','dragleave','drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); }));
-  dz.addEventListener('dragover', () => dz.classList.add('hover'));
-  dz.addEventListener('dragleave', () => dz.classList.remove('hover'));
-  dz.addEventListener('drop', (e) => {
-    dz.classList.remove('hover');
-    const file = e.dataTransfer.files?.[0];
-    if(file){ readAndPreview(file); $('#file')[0].files = e.dataTransfer.files; }
-  });
-}
-
-function handleFile(e){
-  const f = e.target.files?.[0];
-  if(!f) return;
-  readAndPreview(f);
-}
-
-function readAndPreview(file){
-  const fr = new FileReader();
-  fr.onload = () => {
-    const img = new Image();
-    img.onload = () => {
-      $('#preview').removeClass('hidden').find('img').attr('src', fr.result);
-    };
-    img.src = fr.result;
-  };
-  fr.readAsDataURL(file);
-}
-
-async function run(){
-  try{
-    $('#status').text('กำลังประมวลผล…');
-    $('#output').text('Inferring…');
-    const imageUrl = $('#url').val().trim();
-    let base64 = '';
-
-    if(!imageUrl){
-      const f = $('#file')[0].files?.[0];
-      if(!f){ alert('กรุณาเลือกรูปภาพหรือใส่ URL'); return; }
-      const raw = await readAsDataURL(f);
-      base64 = await resizeBase64(raw);
-    }
-
-    const base = `https://classify.roboflow.com/${encodeURIComponent(ROBOFLOW_MODEL)}/${encodeURIComponent(ROBOFLOW_VERSION)}?api_key=${encodeURIComponent(ROBOFLOW_API_KEY)}`;
-    let res;
-    if(imageUrl){
-      res = await fetch(base + `&image=${encodeURIComponent(imageUrl)}`, { method:'POST' });
-    }else{
-      res = await fetch(base, { method:'POST', headers:{ 'Content-Type':'application/x-www-form-urlencoded' }, body: base64 });
-    }
-    const j = await res.json();
-    $('#output').text(JSON.stringify(j, null, 2));
-    renderSummary(j);
-    renderAdvice(j);
-    $('#status').text('สำเร็จ');
-  }catch(err){
-    $('#status').text('เกิดข้อผิดพลาด');
-    $('#output').text(String(err));
-  }
-}
-
-function renderSummary(resp){
-  const el = $('#summary');
-  let list = [];
-  if(Array.isArray(resp?.predictions)){
-    list = resp.predictions.map(x => ({ cls: x.class || x.label || 'Unknown', conf: Number(x.confidence || x.score || 0) }));
-    list.sort((a,b)=> b.conf - a.conf);
-    const top = list.slice(0,5);
-    el.html(top.length ? '<ol>' + top.map(i=>`<li><b>${i.cls}</b> — ${(i.conf*100).toFixed(1)}%</li>`).join('') + '</ol>' : '<em>ไม่มีผลลัพธ์</em>');
-  }else if(Array.isArray(resp?.predicted_classes)){
-    el.html('<ol>' + resp.predicted_classes.map(c => `<li><b>${c}</b></li>`).join('') + '</ol>');
-  }else{
-    el.html('<em>ไม่มีผลลัพธ์</em>');
-  }
-}
-
-function renderAdvice(resp){
-  const el = $('#advice');
-  let candidates = [];
-  if(Array.isArray(resp?.predictions)){
-    candidates = resp.predictions.map(x => String(x.class || x.label || ''));
-  }else if(Array.isArray(resp?.predicted_classes)){
-    candidates = resp.predicted_classes.map(String);
-  }
-  const seen = new Set();
-  const items = [];
-  for(const c of candidates){
-    const key = (c||'').toUpperCase().trim();
-    if(!key || seen.has(key)) continue;
-    seen.add(key);
-    if(ADVICE_MAP[key]){
-      const adv = ADVICE_MAP[key];
-      items.push({ className: c, tips: adv.tips||[], fertilizer: adv.fertilizer||[] });
-    }
-  }
-  if(!items.length){ el.html('<em>ยังไม่มีคำแนะนำ</em>'); return; }
-  const html = items.map(a => `
-    <div class="adv">
-      <b>${a.className}</b>
-      ${a.tips?.length ? '<ul>' + a.tips.map(t=>`<li>${t}</li>`).join('') + '</ul>' : ''}
-      ${a.fertilizer?.length ? '<p><u>ปุ๋ยแนะนำ</u></p><ul>' + a.fertilizer.map(t=>`<li>${t}</li>`).join('') + '</ul>' : ''}
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Durian Health Inference</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img src="https://uploads-ssl.webflow.com/5f6bc60e665f54545a1e52a5/6143750f1177056d60fc52d9_roboflow_logomark_inference.png" alt="logo">
+      <span>Durian Health Inference</span>
     </div>
-  `).join('');
-  el.html(html);
-}
+    <button class="btn btn-ghost" id="signinBtn">Sign in with Google</button>
+  </header>
 
-function clearAll(){
-  $('#file').val(''); $('#url').val(''); $('#preview').addClass('hidden').find('img').attr('src','');
-  $('#summary').html('<em>ยังไม่มีผลลัพธ์</em>');
-  $('#advice').html('<em>ยังไม่มีคำแนะนำ</em>');
-  $('#output').text('รอผลลัพธ์…');
-  $('#status').text('พร้อมทำงาน');
-}
+  <main class="container">
+    <section class="card">
+      <h2>อัปโหลดรูป</h2>
+      <p class="hint">ระบบใช้โมเดลที่กำหนดไว้แล้ว • อัปโหลดรูป “ใบทุเรียน” ให้ชัด เต็มเฟรม พื้นหลังเรียบ</p>
 
-function copyJson(){
-  const txt = $('#output').text();
-  navigator.clipboard.writeText(txt).then(()=>{
-    $('#status').text('คัดลอก JSON แล้ว');
-    setTimeout(()=> $('#status').text('พร้อมทำงาน'), 1500);
-  });
-}
+      <div class="grid">
+        <div class="col">
+          <label class="label">เลือก/วางรูปภาพ</label>
+          <div id="dropzone" class="drop">ลากภาพมาวางที่นี่ หรือ <a href="#" id="pickFile">คลิกเพื่อเลือก</a></div>
+          <input id="file" type="file" accept="image/*" class="hidden">
+          <div id="preview" class="preview hidden"><img /></div>
+        </div>
 
-function readAsDataURL(file){
-  return new Promise((res,rej)=>{
-    const fr = new FileReader();
-    fr.onload = ()=> res(String(fr.result));
-    fr.onerror = rej;
-    fr.readAsDataURL(file);
-  });
-}
+        <div class="col">
+          <label class="label">หรือใส่ Image URL</label>
+          <input id="url" class="input" placeholder="https://example.com/image.jpg">
+          <div class="row">
+            <button id="runBtn" class="btn btn-primary">Run Inference</button>
+            <button id="clearBtn" class="btn btn-ghost">ล้างค่า</button>
+            <button id="resetBtn" class="btn btn-ghost">Reset</button>
+            <span id="status" class="status">พร้อมทำงาน</span>
+          </div>
+        </div>
+      </div>
+    </section>
 
-function resizeBase64(base64, max=1500){
-  return new Promise((resolve)=>{
-    const img = new Image();
-    img.onload = ()=>{
-      const c = document.createElement('canvas');
-      let w = img.width, h = img.height;
-      if(w>h && w>max){ h*=max/w; w=max } else if(h>=w && h>max){ w*=max/h; h=max }
-      c.width = Math.round(w); c.height = Math.round(h);
-      const ctx = c.getContext('2d'); ctx.drawImage(img,0,0,c.width,c.height);
-      resolve(c.toDataURL('image/jpeg', 0.95));
-    };
-    img.src = base64;
-  });
-}
+    <section class="card">
+      <div id="gateAlert" class="alert hidden"></div>
+
+      <div class="grid">
+        <div class="col">
+          <h3>สรุปผล</h3>
+          <div id="summary" class="panel"><em>ยังไม่มีผลลัพธ์</em></div>
+
+          <h3>คำแนะนำ</h3>
+          <div id="advice" class="panel"><em>ยังไม่มีคำแนะนำ</em></div>
+        </div>
+
+        <div class="col">
+          <h3>ผลลัพธ์ JSON</h3>
+          <div class="code-toolbar">
+            <button id="copyBtn" class="btn btn-ghost small">Copy</button>
+          </div>
+          <pre id="output" class="code">รอผลลัพธ์…</pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
