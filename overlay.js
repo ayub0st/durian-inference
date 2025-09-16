@@ -1,3 +1,4 @@
+// overlay.js
 (function(global){
   function drawTopBox(item){
     const img = document.querySelector('#preview img');
