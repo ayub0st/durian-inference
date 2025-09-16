@@ -10,28 +10,31 @@
 <body>
   <header class="topbar">
     <div class="brand">
-      <span class="logo">🍃</span>
+      <img src="https://uploads-ssl.webflow.com/5f6bc60e665f54545a1e52a5/6143750f1177056d60fc52d9_roboflow_logomark_inference.png" alt="logo">
       <span>Durian Health Inference</span>
     </div>
-    <span class="muted small">เวอร์ชันเบต้า</span>
+    <button class="btn btn-ghost" id="signinBtn">Sign in with Google</button>
   </header>
 
   <main class="container">
     <section class="card">
-      <h2>อัปโหลดรูปใบทุเรียน</h2>
-      <p class="hint">เลือกไฟล์ หรือวางลิงก์รูป จากนั้นกด <b>วิเคราะห์</b> • ถ้าต้องเริ่มใหม่ให้กด <b>Reset</b></p>
+      <h2>อัปโหลดรูป</h2>
+      <p class="hint">ระบบใช้โมเดลที่กำหนดไว้แล้ว • อัปโหลดรูป “ใบทุเรียน” ให้ชัด เต็มเฟรม พื้นหลังเรียบ</p>
 
       <div class="grid">
         <div class="col">
-          <div id="dropzone" class="drop">ลากภาพมาวางที่นี่ หรือ <a href="#" id="pickFile">เลือกไฟล์</a></div>
+          <label class="label">เลือก/วางรูปภาพ</label>
+          <div id="dropzone" class="drop">ลากภาพมาวางที่นี่ หรือ <a href="#" id="pickFile">คลิกเพื่อเลือก</a></div>
           <input id="file" type="file" accept="image/*" class="hidden">
-          <div id="preview" class="preview hidden"><img alt="ตัวอย่างภาพ"/></div>
+          <div id="preview" class="preview hidden"><img /></div>
         </div>
 
         <div class="col">
-          <input id="url" class="input" placeholder="ใส่ Image URL (ถ้ามี)">
+          <label class="label">หรือใส่ Image URL</label>
+          <input id="url" class="input" placeholder="https://example.com/image.jpg">
           <div class="row">
-            <button id="runBtn" class="btn btn-primary">วิเคราะห์</button>
+            <button id="runBtn" class="btn btn-primary">Run Inference</button>
+            <button id="clearBtn" class="btn btn-ghost">ล้างค่า</button>
             <button id="resetBtn" class="btn btn-ghost">Reset</button>
             <span id="status" class="status">พร้อมทำงาน</span>
           </div>
@@ -45,10 +48,10 @@
       <div class="grid">
         <div class="col">
           <h3>สรุปผล</h3>
-          <div id="summary" class="panel tall"><em>ยังไม่มีผลลัพธ์</em></div>
+          <div id="summary" class="panel"><em>ยังไม่มีผลลัพธ์</em></div>
 
           <h3>คำแนะนำ</h3>
-          <div id="advice" class="panel tall"><em>ยังไม่มีคำแนะนำ</em></div>
+          <div id="advice" class="panel"><em>ยังไม่มีคำแนะนำ</em></div>
         </div>
 
         <div class="col">
