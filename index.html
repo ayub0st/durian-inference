@@ -10,34 +10,26 @@
 <body>
   <header class="topbar">
     <div class="brand">
-      <img src="https://uploads-ssl.webflow.com/5f6bc60e665f54545a1e52a5/6143750f1177056d60fc52d9_roboflow_logomark_inference.png" alt="logo">
+      <span class="logo">🍃</span>
       <span>Durian Health Inference</span>
     </div>
-    <div class="toolbar">
-      <button class="btn btn-ghost" id="devToggleBtn" aria-expanded="false" aria-controls="devPanel">โหมดนักพัฒนา</button>
-      <button class="btn btn-ghost" id="signinBtn">Sign in with Google</button>
-    </div>
+    <span class="muted small">เวอร์ชันเบต้า</span>
   </header>
 
   <main class="container">
     <section class="card">
-      <h2>อัปโหลดรูป</h2>
-      <p class="hint">อัปโหลด “ใบทุเรียน” ให้ชัด เต็มเฟรม พื้นหลังเรียบ • รองรับวางไฟล์/เลือกไฟล์ หรือใส่ URL</p>
+      <h2>อัปโหลดรูปใบทุเรียน</h2>
+      <p class="hint">เลือกไฟล์ หรือวางลิงก์รูป จากนั้นกด <b>วิเคราะห์</b> • ถ้าต้องเริ่มใหม่ให้กด <b>Reset</b></p>
 
       <div class="grid">
         <div class="col">
-          <label class="label">เลือก/วางรูปภาพ</label>
-          <div id="dropzone" class="drop">ลากภาพมาวางที่นี่ หรือ <a href="#" id="pickFile">คลิกเพื่อเลือก</a></div>
+          <div id="dropzone" class="drop">ลากภาพมาวางที่นี่ หรือ <a href="#" id="pickFile">เลือกไฟล์</a></div>
           <input id="file" type="file" accept="image/*" class="hidden">
-          <div id="preview" class="preview hidden">
-            <img alt="preview"/>
-            <canvas id="overlay"></canvas>
-          </div>
+          <div id="preview" class="preview hidden"><img alt="ตัวอย่างภาพ"/></div>
         </div>
 
         <div class="col">
-          <label class="label">หรือใส่ Image URL</label>
-          <input id="url" class="input" placeholder="https://example.com/image.jpg">
+          <input id="url" class="input" placeholder="ใส่ Image URL (ถ้ามี)">
           <div class="row">
             <button id="runBtn" class="btn btn-primary">วิเคราะห์</button>
             <button id="resetBtn" class="btn btn-ghost">Reset</button>
@@ -48,29 +40,19 @@
     </section>
 
     <section class="card">
-      <div id="gateAlert" class="alert hidden" data-dev-only></div>
+      <div id="gateAlert" class="alert hidden"></div>
 
       <div class="grid">
         <div class="col">
           <h3>สรุปผล</h3>
-          <div id="top3cards" class="top3grid hidden"></div>
-          <div id="summary" class="panel"><em>ยังไม่มีผลลัพธ์</em></div>
+          <div id="summary" class="panel tall"><em>ยังไม่มีผลลัพธ์</em></div>
 
           <h3>คำแนะนำ</h3>
-          <div class="tabs">
-            <button class="tab active" data-tab="tips">คำแนะนำ</button>
-            <button class="tab" data-tab="actives">ตัวยา (สารออกฤทธิ์)</button>
-            <button class="tab" data-tab="fert">ปุ๋ยที่แนะนำ</button>
-          </div>
-          <div id="advice" class="panel">
-            <div id="advice-tips"></div>
-            <div id="advice-actives" class="hidden"></div>
-            <div id="advice-fert" class="hidden"></div>
-          </div>
+          <div id="advice" class="panel tall"><em>ยังไม่มีคำแนะนำ</em></div>
         </div>
 
-        <div class="col dev-panel hidden" id="devPanel">
-          <h3>ผลลัพธ์ JSON (Developer)</h3>
+        <div class="col">
+          <h3>ผลลัพธ์ JSON</h3>
           <div class="code-toolbar">
             <button id="copyBtn" class="btn btn-ghost small">Copy</button>
           </div>
@@ -81,7 +63,6 @@
   </main>
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="overlay.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
